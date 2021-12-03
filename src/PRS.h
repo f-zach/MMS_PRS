@@ -14,12 +14,12 @@ private:
     byte _channelByte;
     int _rawData[8];
     const float _unitConversion[3][3] = {{1,0.001,68.947572932},{1000,1,0.0689475729},{14.503773773,0.0145037738,1}};
-    byte _default_i2c_adresses[8] = {0x28,0x28,0x28,0x28,0x28,0x28,0x28,0x28};
-    byte _default_i2c_adresses[8] = {0,0,0,0,0,0,0,0};
+    byte _default_i2c_address[8] = {0x28,0x28,0x28,0x28,0x28,0x28,0x28,0x28};
+    byte _default_i2c_addresse[8] = {0,0,0,0,0,0,0,0};
 
 public:
     PRSmodule(int i2cAddress);
-    void config(byte sensorPositions, float PressureRange[8], byte diff, int UnitSensor[8], int UnitReq[8], byte sensor_i2c_address[8] =_default_i2c_addresses, bool checkFault = false, int errLED = 5, int busyLED = 6);
+    void config(byte sensorPositions, float PressureRange[8], byte diff, int UnitSensor[8], int UnitReq[8], byte sensor_i2c_address, bool checkFault = false, int errLED = 5, int busyLED = 6);
     void switchToChannel(int ChannelNo);
     void closeAllChannels();
     int readDataSingle(int ChannelNo);
