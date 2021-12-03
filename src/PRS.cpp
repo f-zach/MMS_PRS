@@ -5,7 +5,7 @@ PRSmodule::PRSmodule(int i2cAddress)
     _i2cAddress = i2cAddress;
 }
 
-void PRSmodule::config(byte sensorPositions, float PressureRange[8], byte diff, int UnitSensor[8], int UnitReq[], bool checkFault, int errLED, int busyLED)
+void PRSmodule::config(byte sensorPositions, float PressureRange[8], byte diff, int UnitSensor[8], int UnitReq[8], byte sensor_i2c_address[8], bool checkFault, int errLED, int busyLED)
 {
     _errLED = errLED;
     _busyLED = busyLED;
@@ -22,6 +22,7 @@ void PRSmodule::config(byte sensorPositions, float PressureRange[8], byte diff, 
             _Sensor[_i][0] = PressureRange[_i];
             _Sensor[_i][1] = bitRead(diff, _i);
             _Sensor[_i][2] = UnitSensor[_i];
+            _sensor_i2c_address[_i] = sensor_i2c_address[_i];
 
             _sensorCount++;
         }
@@ -50,7 +51,7 @@ int PRSmodule::readDataSingle(int ChannelNo)
 {
     switchToChannel(ChannelNo);
 
-    Wire.requestFrom(0x28,2);
+    Wire.requestFrom(_sensor_i2c_address[_ChannelNo[ChannelNo]],2);
     rawDataSingle = (Wire.read() << 8 | Wire.read()) & 0x3FFF;
 
     return rawDataSingle;
