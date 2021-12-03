@@ -14,7 +14,6 @@ private:
     byte _channelByte;
     int _rawData[8];
     const float _unitConversion[3][3] = {{1,0.001,68.947572932},{1000,1,0.0689475729},{14.503773773,0.0145037738,1}};
-    byte _default_i2c_address[8] = {0x28,0x28,0x28,0x28,0x28,0x28,0x28,0x28};
     byte _sensor_i2c_address[8] = {0,0,0,0,0,0,0,0};
 
 public:
@@ -33,6 +32,7 @@ public:
     int rawDataSingle;
     float Pressure[8];
     float PressureSingle;
+    byte default_i2c_address[8] = {0x28,0x28,0x28,0x28,0x28,0x28,0x28,0x28};
     
 
 };
