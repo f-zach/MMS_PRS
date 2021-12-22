@@ -1,16 +1,15 @@
 #include "PRS.h"
 
 PRSmodule::PRSmodule(int i2cAddress)
+    : _i2cAddress(i2cAddress)
 {
-    _i2cAddress = i2cAddress;
+    
 }
 
 void PRSmodule::config(byte sensorPositions, float PressureRange[8], byte diff, int UnitSensor[8], int UnitReq[8], byte sensor_i2c_address[8], bool checkFault, int errLED, int busyLED)
 {
     _errLED = errLED;
     _busyLED = busyLED;
-
-
 
     _sensorCount = 0;
 
