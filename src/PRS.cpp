@@ -1,5 +1,4 @@
 #include "PRS.h"
-
 HoneywellPressureSensor::HoneywellPressureSensor()
 {
 }
@@ -26,9 +25,6 @@ void HoneywellPressureSensor::assign_unit(int unit)
 }
 
 // Assigns a boolean value if the sensor is differential or not
-//    input: output_unit   →    MILLIBAR or 0 for millibars
-//                              BAR or 1 for bars
-//                              PSI or 2 for psi
 void HoneywellPressureSensor::assign_differential(bool differential)
 {
     _differential = differential;
@@ -36,42 +32,62 @@ void HoneywellPressureSensor::assign_differential(bool differential)
 
 // Assigns th unit that the user wants to be output by the library
 
+//    output_unit:  MILLIBAR or 0 for millibars, BAR or 1 for bars, PSI or 2 for psi
 void HoneywellPressureSensor::assign_output_unit(int output_unit)
 {
     _output_unit = output_unit;
 }
 
+/*
+ Assigns a channel number to the sensor (for use with TCA9548 I²C-multiplexer)
+
+ channel_in: Channel number from 0 to 7
+*/
 void HoneywellPressureSensor::assign_channel(int channel_in)
 {
     channel = channel_in;
 }
 
-void HoneywellPressureSensor::configure_sensor(int i2c_address, float range, int unit, int differential, int output_unit, int position)
+/*
+    Assigns values to all variables required for sensor opertaion
+
+    i2c_address:    Sensor I²C-address
+    range:          Sensor measurement range
+    unit:           Sensor output unit (MILLIBAR or 0 for millibar; BAR or 1 for bar; PSI or 2 for PSI)
+    differential:   Sensor measurement method (false: absolute,relative; true: differential)
+    output_unit:    User reqired output unit for output pressure values (MILLIBAR or 0 for millibar; BAR or 1 for bar; PSI or 2 for PSI)
+    channel:        I²C-multiplexer channel (values 0 to 7)
+*/
+void HoneywellPressureSensor::configure_sensor(int i2c_address, float range, int unit, int differential, int output_unit, int channel)
 {
     assign_I2C_address(i2c_address);
     assign_range(range);
     assign_unit(unit);
     assign_differential(differential);
     assign_output_unit(output_unit);
-    assign_channel(position);
+    assign_channel(channel);
 }
 
+// Read the unconverted digital pressure data from the sensor
 int HoneywellPressureSensor::read_data()
 {
     Wire.requestFrom(_i2c_address, 2);
+
+    // The data is read and the first two bits of the MSB are set to zero, since they can contain unwanted data
     _data = (Wire.read() << 8 | Wire.read()) & 0x3FFF;
 
     return _data;
 }
 
+// Converts the digital pressure data to a float pressure value. The output pressure unit ist defined by the user in the config function or with assign_output_unit
 float HoneywellPressureSensor::data2pressure()
 {
-
     pressure = ((((_data - 1638) * (_range - (-_range * _differential))) / 13107) - (_range * _differential)) * _unitConversion[_unit][_output_unit];
 
     return pressure;
 }
 
+// Reads the data from the sensor and converts it
 float HoneywellPressureSensor::read_pressure()
 {
     read_data();
@@ -80,7 +96,8 @@ float HoneywellPressureSensor::read_pressure()
     return pressure;
 }
 
-void HoneywellPressureSensor::display_data()
+// Displays the configuration data of the sensor via Serial
+void HoneywellPressureSensor::display_config_data()
 {
     Serial.print("I2C-Adresse: ");
     Serial.println(_i2c_address, HEX);

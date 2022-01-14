@@ -17,7 +17,7 @@ class HoneywellPressureSensor
 
     public:
         HoneywellPressureSensor();
-        void configure_sensor(int i2c_address, float range, int unit, int differential, int output_unit, int position);
+        void configure_sensor(int i2c_address, float range, int unit, int differential, int output_unit, int position = 0);
         void assign_I2C_address(int i2c_adddress);
         void assign_range(float range);
         void assign_unit(int unit);
@@ -27,7 +27,7 @@ class HoneywellPressureSensor
         int read_data();
         float data2pressure();
         float read_pressure();
-        void display_data();
+        void display_config_data();
         int channel;
         float pressure;  
         const float _unitConversion[3][3] = {{1,0.001,68.947572932},{1000,1,0.0689475729},{14.503773773,0.0145037738,1}};  
