@@ -15,10 +15,12 @@ void HoneywellPressureSensor::assign_range(float range)
     _range = range;
 }
 
-// Assigns the unit to the sensor
-//    input unit    →    MILLIBAR or 0 for millibars
-//                       BAR or 1 for bars
-//                       PSI or 2 for psi
+/*
+    Assigns the unit to the sensor
+    input unit    →    MILLIBAR or 0 for millibars
+                       BAR or 1 for bars
+                       PSI or 2 for psi
+*/
 void HoneywellPressureSensor::assign_unit(int unit)
 {
     _unit = unit;
@@ -114,26 +116,29 @@ PRSmodule::PRSmodule(int i2cAddress)
 {
 }
 
+
+
+
+/*
+Configures the PRS module
+
+Inputs:     sensorPositions         Byte containing the sensor positions on the module
+                                    0 → not occupied, 1 → occupied
+                                    e.g.: 10011100 → Sensor positions 3,4,5 and 8 are occupied
+            
+            PressureRange           Array with a size of eight containing the unitless value of the pressure range of the sensors (for differential the absolute amount).
+                                    The values are put into the corresponding place of the array, e.g. PressureRange[5] = 100 → The unitless pressure range of the sensor in 
+                                    position 6 (array indexing!) is 100.
+
+            diff                    Byte containing information, if the sensor in a certain slot is a differential or a absolute/relative sensor
+                                    0 → absolute/relative Sensor, 1 → differential sensor
+                                    e.g.: 00001111 → sensors 1,2,3,4 are differential
+
+            unit sensors            
+                                            
+*/
 void PRSmodule::config(byte sensorPositions, float PressureRange[8], byte diff, int UnitSensor[8], int UnitReq[8], byte sensor_i2c_address[8], bool checkFault)
 {
-    /*
-    Configures the PRS module
-
-    Inputs:     sensorPositions         Byte containing the sensor positions on the module
-                                        0 → not occupied, 1 → occupied
-                                        e.g.: 10011100 → Sensor positions 3,4,5 and 8 are occupied
-                
-                PressureRange           Array with a size of eight containing the unitless value of the pressure range of the sensors (for differential the absolute amount).
-                                        The values are put into the corresponding place of the array, e.g. PressureRange[5] = 100 → The unitless pressure range of the sensor in 
-                                        position 6 (array indexing!) is 100.
-
-                diff                    Byte containing information, if the sensor in a certain slot is a differential or a absolute/relative sensor
-                                        0 → absolute/relative Sensor, 1 → differential sensor
-                                        e.g.: 00001111 → sensors 1,2,3,4 are differential
-
-                unit sensors            
-                                               
-    */
 
     _sensorCount = 0;
 
@@ -151,6 +156,11 @@ void PRSmodule::config(byte sensorPositions, float PressureRange[8], byte diff, 
     SensorCount = _sensorCount;
 }
 
+/*
+    Switch the I²C-switch of the PRS module to a desired channel
+
+    Inputs:     ChannelNo           Number of the channel to switch to (0-7)
+*/
 void PRSmodule::switchToChannel(int ChannelNo)
 {
     _channelByte = B00000001 << ChannelNo;
@@ -160,6 +170,9 @@ void PRSmodule::switchToChannel(int ChannelNo)
     Wire.endTransmission();
 }
 
+/*
+    Close all channels of the I²C-switch
+*/
 void PRSmodule::closeAllChannels()
 {
     Wire.beginTransmission(_i2cAddress);
@@ -167,17 +180,27 @@ void PRSmodule::closeAllChannels()
     Wire.endTransmission();
 }
 
-float PRSmodule::readPressSingle(int sensor_no)
-{
-    switchToChannel(_Sensor[sensor_no].channel);
+/*
+    Read the pressure value of a single pressure sensor 
 
-    PressureSingle = _Sensor[sensor_no].read_pressure();
+    Inputs:     sensorNo            Number of the desired sensor to read
+
+    Outputs:    PressureSingle      Pressure value read and converted from the sensor
+*/
+float PRSmodule::readPressSingle(int sensorNo)
+{
+    switchToChannel(_Sensor[sensorNo].channel);
+
+    PressureSingle = _Sensor[sensorNo].read_pressure();
 
     closeAllChannels();
 
     return PressureSingle;
 }
 
+/*
+    Read all sensors installed on the module. This function will automatically read all sensors which were configured with the config function
+*/
 void PRSmodule::readPressAll()
 {
     for (int i = 0; i < SensorCount; i++)
